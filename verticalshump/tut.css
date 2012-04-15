@@ -1,0 +1,79 @@
+@import url("../main.css");
+
+body
+{
+	background-color:#85a69e;
+}
+
+div.content
+{
+	color:#3a534c;
+}
+
+
+div.partmain
+{
+	background-color:#b4d0c9;
+}
+
+h1
+{
+	color: #b4d0c9;
+}
+
+div.partnum
+{
+	color:#b4d0c9;
+}
+
+a
+{
+	color:#3a534c;
+}
+
+a:hover
+{
+	color:#85a69e;
+}
+
+div.arrow
+{
+	background-image:url("images/arrow2.png");
+}
+
+div.note
+{
+	border:1px solid #85a69e;
+	border-bottom:1px solid #cae1db;
+	background-color:#9fbcb5;
+	padding:3px;
+	font-size:10pt;
+}
+
+code
+{
+	background-color:#d0e8e2;
+	color:black;
+}
+
+img.floating
+{
+	float:left;
+	margin:8px;
+	border:1px solid black;
+}
+
+textarea
+{
+	width:700px;
+	height:200px;
+	border:none;
+	background-color:#d0e8e2;
+	color:black;
+	
+}
+
+img.framed
+{
+	border:1px solid black;
+}

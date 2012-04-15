@@ -1,0 +1,652 @@
+<!-- saved from url=(0050)http://users.wpi.edu/~morganquirk/flixel/tut2.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+		<title>Tutorials - Vertical Shooter</title>
+		<link rel="stylesheet" type="text/css" href="./tut.css">
+	</head>
+
+	<body>
+		<div class="content">
+			<h3><a class="back" href="../index.html">Back</a></h3>
+			<h1>Vertical Shooter</h1>
+
+			<div class="part">
+				<div class="partnum">1</div>
+				<div class="partmain">
+
+					<h2>Main class</h2>
+					<p>Create a new project as in the first tutorial. Copy the flixel <code>org</code> folder into <code>src</code> again,
+					and clear out the <code>Main.as</code>. Our version of this file will look very similar to the last one, with
+					some small changes. Check it out:</p>
+					<textarea resizable="false" readonly="true">package
+{
+	import org.flixel.FlxGame;
+	import game.GameState;
+
+	public class Main extends FlxGame
+	{
+		public function Main()
+		{
+			super(280, 320, GameState, 2);
+		}
+	}
+}
+					</textarea>
+
+					<p>We're importing our GameState this time, we didn't have to do that last time! Well, we're going to be organizing
+					our files a little better. While we're talking about this, how about you make a new folder inside the src directory
+					and call it <code>game</code>. We'll put all our game-related code in there. In some projects, we may have multiple
+					libraries or parts of our code; one can imagine we might have a <code>tools</code> directory or a <code>util</code>
+					directory in more complicated projects.
+					</p>
+					<p>
+					Another thing that's different is that our resolution is a bit weird. 280x320? Well, we're making a vertical shooter
+					so we need some vertical screen real estate. Go to your <code>Project &gt; Properties</code> and set the resolution there
+					to twice these numbers. 560 x 640.
+					</p>
+
+				</div>
+			</div>
+			<div class="arrow"></div>
+
+			<div class="part">
+				<div class="partnum">2</div>
+				<div class="partmain">
+				<h2>Player object</h2>
+					<p>Here we go. So, let's get a player on scren and moving around with the arrow keys. First, we'll start working on
+					our GameState. In your new <code>game</code> folder (You did make a <code>game</code> folder, right? Inside <code>src</code>?)
+					create a new class, GameState. Make it look like this:</p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class GameState extends FlxState
+	{
+		public var player:Player;
+
+		public function GameState()
+		{
+			super();
+		}
+
+		override public function create():void
+		{
+			// Create the ship
+			player = new Player(125, 230);
+			// Add it to the GameState
+			add(player);
+
+			super.create();
+		}
+	}
+}
+
+					</textarea>
+					<p>Now, we don't have a Player class yet, so this won't magically work. But really all we're trying to do is make a sprite
+					which will move around based on keypresses. This is pretty easy!</p>
+					<p>In the <code>game</code> folder, let's make another new class called Player. Here's what it will look like.</p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class Player extends FlxSprite
+	{
+		// Embed the player's image in the swf
+		[Embed (source = "../../ship.png")] private var player_img:Class;
+
+		public function Player(x:int, y:int)
+		{
+			// Make a FlxSprite at the given location, using our image
+			super(x,y,player_img)
+		}
+	}
+}
+
+					</textarea>
+					<p>This is going to require some explanation. What we're doing is we're making the Player class be a subclass of FlxSprite.
+					Flixel Sprites are useful because they can be given an image which will be drawn to the screen every frame at a specific location.
+					Next, we embed the player image into the SWF using the bracket embed syntax <code>[Embed...]</code>. This is nicer than loading
+					an image from disk because you only have to give someone the SWF and everything is included.
+					</p>
+
+					<p>Our constructor is going to take the x and y as arguments, so that we can tell the player where to spawn inside of our <code>GameState</code>.
+					We pass that information to the FlxSprite constructor (<code>super(x,...)</code>) which will create a sprite at that location with the given image.
+					</p>
+					<p>Now let's get the ship image and put it in the right place so we can embed it. Create a folder called <code>data</code> inside the project (so,
+					at the same level as the <code>src</code> directory.) This is where we'll put our graphics. Download my ship.png <a href="./ship.png">here</a> or make your own.
+					Once you've got that in the data folder, you can run the game and you should be greeted with a black screen with a ship on it! Truly, this is a turning point in our lives.
+					</p>
+
+					<div class="right">
+						<a target="_blank" href="./ship.png">ship.png</a>
+					</div>
+				</div>
+
+			</div>
+			<div class="arrow"></div>
+
+			<div class="part">
+				<div class="partnum">3</div>
+				<div class="partmain">
+				<h2>Moving around</h2>
+
+					<p>It may seem like this was a lot of work to just do this simple thing, but you'll see how many things are very easy now that we've done this. We'll make the player move
+					now with the arrow keys. After the constructor function in Player, add this bit of code:</p>
+					<textarea resizable="false" readonly="true">override public function update():void
+{
+	// Reset our velocity so we don't move after we've let go of the keys
+	velocity.x = 0;
+	velocity.y = 0;
+
+	// Set our velocity based on which keys we're pressing
+	if ( FlxG.keys.LEFT )
+	{
+		velocity.x = -120;
+	}
+	if ( FlxG.keys.RIGHT )
+	{
+		velocity.x = 120;
+	}
+	if ( FlxG.keys.UP )
+	{
+		velocity.y = -120;
+	}
+	if ( FlxG.keys.DOWN )
+	{
+		velocity.y = 120;
+	}
+
+	// We have to call the FlxSprite's update or our sprite won't update.
+	super.update();
+}
+		</textarea>
+					<p>Here, we're overriding the update function. This function is called for each object every frame of the game by the GameState (unless you forgot to call <code>add</code>!).
+					Overriding the update is the general way to add dynamic functionality to a sprite or any object.
+					First we reset the velocity, so the player doesn't slide around like he's on ice. Then, based on what key the player is pressing, we set the velocity.
+					If they're pressing left, we set the x component to -120 (that's in pixels per second). If they're pressing up, we set the y component. And so on.
+					Don't forget to call the superclass update at the end!</p>
+
+					<p>If you're confused about where to write this code, this is what your <code>Player.as</code> should look like:</p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class Player extends FlxSprite
+	{
+		// Embed the player's image in the swf
+		[Embed (source = "../../ship.png")] private var player_img:Class;
+
+		public function Player(x:int, y:int)
+		{
+			// Make a FlxSprite at the given location, using our image
+			super(x,y,player_img)
+		}
+
+		override public function update():void
+		{
+			// Reset our velocity so we don't move after we've let go of the keys
+			velocity.x = 0;
+			velocity.y = 0;
+
+			// Set our velocity based on which keys we're pressing
+			if ( FlxG.keys.LEFT )
+			{
+				velocity.x = -120;
+			}
+			if ( FlxG.keys.RIGHT )
+			{
+				velocity.x = 120;
+			}
+			if ( FlxG.keys.UP )
+			{
+				velocity.y = -120;
+			}
+			if ( FlxG.keys.DOWN )
+			{
+				velocity.y = 120;
+			}
+
+			// We have to call the FlxSprite's update or our sprite won't update.
+			super.update();
+		}
+
+
+	}
+}
+
+					</textarea>
+					<p>
+					Yeah, if you run it now you should be able to move the player around. Nice. One more thing, quickly, is that we should change
+					the background color of the stage from pure black to something a bit lighter. Inside the <code>create</code> function of GameState, throw
+					this in there: <code>bgColor = 0xff222222;</code> to make it a bit lighter.
+					</p>
+				</div>
+			</div>
+			<div class="arrow"></div>
+
+			<div class="part">
+				<div class="partnum">4</div>
+				<div class="partmain">
+				<h2>Bullets, guns, shooting bullets from guns</h2>
+					<p>Okay, this is going to be a vertical space shooter, so we're going to need bullets. At the very least, the player's gotta have some
+					machinegun or cannon or something. Make a new file, <code>Bullet.as</code>. Here's what it will contain:</p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.FlxSprite;
+
+	public class Bullet extends FlxSprite
+	{
+		[Embed (source = "../../shot.png")] private var bullet_img:Class;
+
+		public function Bullet(x:int, y:int, xv:int, yv:int)
+		{
+			super(x, y, bullet_img);
+			velocity.x = xv;
+			velocity.y = yv;
+		}
+
+		override public function update():void
+		{
+			super.update();
+
+			// When it goes off the top of the screen we don't need it to stay around
+			if ( !onScreen() )
+			{
+				kill();
+			}
+		}
+
+	}
+
+}
+				</textarea>
+				<p>There's some interesting bits of code in here. One thing you'll notice is that we're taking two variables in the constructor, <code>xv</code> and <code>yv</code> and are
+				using them to set the initial velocity of the bullets. For this, the bullets we're going to create will just fly upwards, but you can imagine
+				having different bullet patterns.
+				</p>
+				<p>Like in the player class, we're overriding the update method. Inside here, we're doing one simple check. If the bullet is offscreen (<code>!onScreen()</code>) then we'll
+				destroy it. Flixel provides many nice functions like this one to do common tasks and checks. And again, don't forget to call the super's update() function.
+				</p>
+				<p>Okay, we have a bullet class. Oh, before I forget, grab my bullet image <a href="./shot.png">here</a> and put it in that data folder. Great. Now what we need to do is make
+				a <i>group</i> in our GameState which we'll put all our bullets into. This will make collision detection very easy, as well as ensuring that objects are drawn on the right layers.
+				Here's what we're going to make our <code>GameState.as</code> look like:</p>
+				<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class GameState extends FlxState
+	{
+		public var player:Player;
+
+		public var friendly_bullets:FlxGroup;
+
+		public function GameState()
+		{
+			super();
+		}
+
+		override public function create():void
+		{
+			// Create our group for the friendly bullets
+			friendly_bullets = new FlxGroup();
+			add(friendly_bullets);
+
+			// Create the ship
+			player = new Player(125, 230);
+			// Add it to the GameState
+			add(player);
+
+			super.create();
+		}
+	}
+}
+
+				</textarea>
+				<p>So, at the top we declare the type of a new variable, <code>friendly_bullets</code> as a <code>FlxGroup</code>. Then, in <code>create</code>, we construct the group and add it to the state.
+				Now, everything that you <code>add</code> to the group will be updated and rendered almost as if we'd <code>add</code>ed it to the state. Now, on to actually making bullets! In <code>Player.as</code>
+				we have to add a key that will fire. After the movement code in <code>update</code> add this bit:
+				<textarea resizable="false" readonly="true">	// Firing
+	if ( FlxG.keys.justPressed("X"))
+	{
+		var b:Bullet = new Bullet(x + 7, y + 1, 0, -190);
+		(FlxG.state as GameState).friendly_bullets.add(b);
+
+		var b2:Bullet = new Bullet(x + 29, y + 1, 0, -190);
+		b2.scale.x = -1;
+		(FlxG.state as GameState).friendly_bullets.add(b2);
+	}
+				</textarea>
+				</p><p>We're using the <code>justPressed</code> function so that if you hold down x it doesn't fire continually; <code>justPressed</code> only triggers once per key press. Then
+				we declare a new bullet, give it an x and y which are offset from the player's position, and set the yv to -190 (so it moves quickly upwards.) The way we're adding it to the bullet group is a bit interesting.
+				<code>FlxG</code> is a global object which gives you some utility functions and variables. We're using <code>FlxG.state</code> to get the current state the game is in. Then we cast it as a GameState, giving
+				us access to the public <code>friendly_bullets</code> group we made.</p>
+				<p>We make a second bullet the same way, the only difference being the position and that extra line of code, <code>b2.scale.x = -1;</code> which will flip the graphic horizontally. Okay, if you run the game you
+				should be able to move around and fire bullets!
+					</p><div class="right">
+						<a target="_blank" href="./shot.png">shot.png</a>
+					</div>
+				</div>
+			</div>
+			<div class="arrow"></div>
+
+			<div class="part">
+				<div class="partnum">5</div>
+				<div class="partmain">
+				<h2>Enemies</h2>
+					<p>Our challenge in this game is going to be avoiding/destroying enemies who descend from the top of the screen. So, let's make the enemies. If you haven't guessed yet, we're going to make a new file and a new class.
+					Make a file called <code>Enemy.as</code>, this is going to look a bit like Player or Bullet in that it will extend FlxSprite. A rule of thumb here in flixel is that if it's going to be an object moving around, it's
+					probably going to extend FlxSprite. These enemies will spawn above the screen, and they'll move downwards in a zig-zag pattern.</p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class Enemy extends FlxSprite
+	{
+		// The enemy moves back and forth, these will be the x coordinates that he will move between.
+		private var left_ex:int;
+		private var right_ex:int;
+
+		[Embed (source = "../../enemy.png")] private var enemy_img:Class;
+
+		public function Enemy(x:int, y:int)
+		{
+			super(x, y, enemy_img);
+
+			left_ex = x - 40;
+			right_ex = x + 40;
+			velocity.y = 50;
+			// 50% chance to start moving right
+			if ( Math.random() &gt; 0.5 )
+			{
+				velocity.x = 30;
+			}
+			// Otherwise left
+			else
+			{
+				velocity.x = -30;
+			}
+			health = 3;
+		}
+
+		override public function update():void
+		{
+			super.update();
+
+			// Bounce off the left extent
+			if ( x &lt;= left_ex ) { velocity.x = 30; }
+
+			// And off the right
+			if ( x &gt;= right_ex ) { velocity.x = -30; }
+
+			if ( health &lt;= 0) { kill(); }
+		}
+	}
+}
+					</textarea>
+					<p>To do the zig-zag pattern, we want to define a left side and a right side that it effectively "bounces" off. So, if the x position is less than
+					the starting x - 40 pixels, it will change directions. We're doing this by saving the left extent (<code>left_ex</code>) and right extent(<code>right_ex</code>)
+					based on the starting location. Then, we choose at random which direction it starts moving. <code>if ( Math.random() &gt; 0.5 )</code> might be a little confusing.
+					<code>Math.random()</code> returns a value between 0 and 1, so checking if it's &gt; 0.5 means that in 50% of cases that will be true. So, half the time we're going
+					to start moving left, half the time we're going to start moving right. We're also setting the y velocity to 50, so it will always move downwards.
+					</p>
+					<p>Now, in update, we implement the zig-zagging feature. We'll check if our x has reached the left extent, and if it has start moving right. And vice-versa. Additionally,
+					if the enemy's health has been reduced to 0, destroy the sprite. Oh, get the image for these enemies <a href="./enemy.png">here</a>.
+					Great, but we still need to create the enemies, and maybe put them in some sort of group like we did with
+					the bullets.
+					</p>
+					<p>So, make a group in GameState like we did for the bullets, call it <code>enemies</code> and remember to declare it at the top as a FlxGroup, and construct and add it in <code>create</code>.
+					We're going to make these enemies every second or so, and we'll do it from the GameState's update. Here's the <code>GameState.as</code> after these changes.
+					</p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class GameState extends FlxState
+	{
+		public var player:Player;
+
+		public var friendly_bullets:FlxGroup;
+		public var enemies:FlxGroup;
+
+		public var enemy_timer:Number = 0;
+
+		public function GameState()
+		{
+			super();
+		}
+
+		override public function create():void
+		{
+			// Create our group for the friendly bullets
+			friendly_bullets = new FlxGroup();
+			add(friendly_bullets);
+
+			// Create the ship
+			player = new Player(125, 230);
+			// Add it to the GameState
+			add(player);
+
+			// Create our enemies group
+			enemies = new FlxGroup();
+			add(enemies);
+
+			super.create();
+		}
+
+		override public function update():void
+		{
+			// Make a new enemy every one and a half seconds.
+			enemy_timer += FlxG.elapsed;
+			if ( enemy_timer &gt; 1.5 )
+			{
+				enemies.add(new Enemy(Math.random() * (screen.width - 40) + 20, -30));
+				enemy_timer = 0;
+			}
+
+			super.update();
+		}
+	}
+}
+				</textarea>
+				<p>We've done a couple things here. We needed to make a new variable, <code>enemy_timer</code>, so that we can make enemies on a certain interval.
+				In our overridden update, we add <code>FlxG.elapsed</code> to <code>enemy_timer</code>. FlxG.elapsed is a handy variable which stores the number of
+				seconds since the last frame. This number is usually around 0.15 or so. So, our timer will be counting up the number of seconds. If the timer gets
+				over a second and a half, we reset it and create an enemy. There's some math here which basically chooses and x coordinate at random inside the range of the screen.
+				And that's it! You should have (invulnerable) enemies that fly downwards from the top of the screen.</p>
+				<div class="right">
+					<a target="_blank" href="./enemy.png">enemy.png</a>
+				</div>
+				</div>
+			</div>
+			<div class="arrow"></div>
+
+			<div class="part">
+				<div class="partnum">6</div>
+				<div class="partmain">
+				<h2>Collisions</h2>
+					<p>We're going to make the player collide with the enemies, and the enemies collide with bullets. The way to do this is to use a collide function on the two groups,
+					and provide a callback function. When a collision is detected, flixel will call the callback function we provided and hand it the two objects that collided. In the <code>update</code>
+					of GameState, put these lines of code:
+					</p>
+					<textarea resizable="false" readonly="true">// Collide the bullets and the enemies
+FlxU.overlap(friendly_bullets, enemies, collide_bullets_enemies);
+
+// The enemies and the player
+FlxU.overlap(player, enemies, collide_player_enemies);
+					</textarea>
+					<p>We need to now write these two functions, <code>collide_bullets_enemies</code> and <code>collide_player_enemies</code>. These will go inside the GameState:</p>
+					<textarea resizable="false" readonly="true">	public function collide_bullets_enemies(b:Bullet, e:Enemy) : void
+	{
+		b.kill();
+		e.health -= 1;
+	}
+
+	public function collide_player_enemies(p:Player, e:Enemy) : void
+	{
+		e.kill();
+		p.flicker(0.5);
+	}
+					</textarea>
+					<p>The collide function <code>FlxU.overlap</code> calls the supplied function and gives it the two colliding objects. In the case of the first one, it's a bullet and an enemy.
+					The body of the function says kill the bullet and subtract 1 from the enemy's health. The second function, when the player collides with an enemy, destroys the enemy and makes
+					the player blink as if he's taken damage.
+					</p><p>Now you should be able to play the game and destroy the enemies or get hit by them. In later tutorials, we'll work on effects like
+					explosions, sounds, particles, etc. We'll just add one more nice visual feature then call it done. </p>
+				</div>
+			</div>
+			<div class="arrow"></div>
+
+			<div class="part">
+				<div class="partnum">7</div>
+				<div class="partmain">
+				<h2>Starfield</h2>
+					<p>We're going to put some stars in the background now. Make a file, <code>Star.as</code> which will be a sprite representing a single star. In the GameState, we'll create a bunch
+					of them at the beginning. When a star goes off the bottom of the screen, it will respawn itself at the top with random properties. Here's the code for <code>Star.as</code></p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class Star extends FlxSprite
+	{
+
+		[Embed (source = "../../star.png")] private var star_img:Class;
+
+		public function Star()
+		{
+			super();
+			loadGraphic(star_img, true, false, 8, 8);
+		}
+
+		// Instead of using the constructor to position the stars we'll do it separately
+		public function spawn(x:int, y:int) : void
+		{
+			this.x = x;
+			this.y = y;
+			frame = Math.random() * 3; // Choose a random frame
+
+			// The downwards velocity is based on the size
+			velocity.y = (frame * 10) + 20 + Math.random() * 5;
+			// Random transparency
+			alpha = 0.25 * Math.random() + 0.25;
+		}
+
+		override public function update():void
+		{
+			// Respawn it when it goes offscreen
+			if (y &gt; FlxG.height)
+			{
+				y = -8;
+				spawn(Math.random() * FlxG.width, -8);
+			}
+			super.update();
+		}
+
+	}
+}
+					</textarea>
+					<p><a href="./star.png">Here</a> is the star image. It's a sprite sheet as opposed to a single image. This means that it's an image with multiple frames, lined up horizontally.
+					We're using <code>loadGraphic</code> to load this image, which allows us to specify that we want a sprite sheet. We tell it the width and height are both 8, so it knows that this image
+					has 4 frames (We're not going to use the 4th one, but I left it in anyway). Instead of positioning the object in the constructor, we're going to do it in a new function, <code>spawn</code>.
+					This way, when we respawn the sprites, we don't have to delete the objects and create new ones. </p>
+					<p>Now we have to make these stars appear in the first place; we'll do that in GameState. Make a new FlxGroup for the stars, call it starfield, and create and add it in the <code>create</code>
+					function, <i>before</i> you add either of the other two groups. To make this easy, here's the completed <code>GameState.as</code>:</p>
+					<textarea resizable="false" readonly="true">package game
+{
+	import org.flixel.*;
+
+	public class GameState extends FlxState
+	{
+		public var player:Player;
+
+		public var friendly_bullets:FlxGroup;
+		public var enemies:FlxGroup;
+		public var starfield:FlxGroup;
+
+		public var enemy_timer:Number = 0;
+
+		public function GameState()
+		{
+			super();
+		}
+
+		override public function create():void
+		{
+
+			bgColor = 0xff181818;
+
+			starfield = new FlxGroup();
+			add(starfield);
+
+			for (var i:int = 0; i &lt; 150; i++)
+			{
+				var s:Star = new Star();
+				s.spawn(Math.random() * screen.width, Math.random() * screen.height - 10);
+				starfield.add(s);
+			}
+
+			// Create our group for the friendly bullets
+			friendly_bullets = new FlxGroup();
+			add(friendly_bullets);
+
+			// Create the ship
+			player = new Player(125, 230);
+			// Add it to the GameState
+			add(player);
+
+			// Create our enemies group
+			enemies = new FlxGroup();
+			add(enemies);
+
+			super.create();
+		}
+
+		override public function update():void
+		{
+			// Make a new enemy every one and a half seconds.
+			enemy_timer += FlxG.elapsed;
+			if ( enemy_timer &gt; 1.5 )
+			{
+				enemies.add(new Enemy(Math.random() * (screen.width - 40) + 20, -30));
+				enemy_timer = 0;
+			}
+
+			// Collide the bullets and the enemies
+			FlxU.overlap(friendly_bullets, enemies, collide_bullets_enemies);
+
+			// The enemies and the player
+			FlxU.overlap(player, enemies, collide_player_enemies)
+
+			super.update();
+		}
+
+		public function collide_bullets_enemies(b:Bullet, e:Enemy) : void
+		{
+			b.kill();
+			e.health -= 1;
+		}
+
+		public function collide_player_enemies(p:Player, e:Enemy) : void
+		{
+			e.kill();
+			p.flicker(0.5);
+		}
+
+	}
+}
+					</textarea>
+					<p>Run the game and you should have a nice, <i>ultra-realistic</i> scrolling starfield in the background.
+					That's it for this tutorial, the next one will be a change in pace. We'll explore sounds, visual effects,
+					and some other flixel features. <a href="../collapse">Onwards!</a>
+					</p>
+					<div class="right">
+						<a target="_blank" href="./star.png">star.png</a> | <a href="../collapse">Next Tutorial</a>
+					</div>
+				</div>
+			</div>
+			<div style="clear:both;padding-bottom:10px;">
+			<h3><a class="back" href="../index.html">Back</a></h3>
+			</div>
+
+		</div>
+	
+
+</body></html>

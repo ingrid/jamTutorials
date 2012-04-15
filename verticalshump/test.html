@@ -1,0 +1,42 @@
+<doc-type html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="./../style.css">
+</head>
+<body>
+<div id="main">
+  <p>
+    For this tutorial we will be making a simple vertical space shooter.
+  </p>
+  
+  <p>
+    This snippet shows the bare minimum you need to create a game in jam.
+  </p>
+  <div class="gist" style="width:600px;margin:auto;">
+    <script src="https://gist.github.com/2390157.js"> </script>
+  </div>
+  <p>
+    The first three lines are just telling the page to call our initialization function when it's ready. Within the initialization function, we create a game, and the call Game.run() to set things in motion. The middle line simply adds a border around the game so we can see it (as there is nothing else to see at the moment).
+  </p>
+  
+  <p>
+    The first thing we'll want to add is the player's ship. Update your initialize function so it looks like this.
+  </p>
+  <div class="gist">
+    <script src="https://gist.github.com/2390229.js"> </script>
+  </div>
+  <p>
+    We create the sprite objects with the intial coordinates, and set an image for that sprite. Most importantly, we add it to the game. If a sprite isn't added to the game, it won't be drawn.
+  </p>
+  <p>
+    As you might notice, the player can't control his ship yet. To add controls, we need to extend the ship's update function. The player code should now look something like this.
+  </p>
+  <div class="gist">
+    <script src="https://gist.github.com/2390285.js"> </script>
+  </div>
+  <p>
+    Simple, right? But now the player can move off screen, which is probably not the behaviour you'd want.
+  </p>
+</div>
+</body>
+</html>

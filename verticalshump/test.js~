@@ -1,0 +1,10 @@
+window.onload = function(){
+    initialize();
+}
+    
+function initialize(){
+    var game = jam.Game(800, 600, document.body);
+    game._canvas.style.border="1px solid black";
+
+    game.run();
+}

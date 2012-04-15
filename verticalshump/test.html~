@@ -1,0 +1,16 @@
+<doc-type html>
+<html>
+<head>
+</head>
+<body>
+For this tutorial we will be making a simple vertical space shooter.
+
+This snippet shows the bare minimum you need to create a game in jam.
+
+<div style="width:600px;margin:auto;">
+<script src="https://gist.github.com/2390157.js"> </script>
+</div>
+
+The three lines are just telling the page to call our initialization function when it's ready.
+</body>
+</html>

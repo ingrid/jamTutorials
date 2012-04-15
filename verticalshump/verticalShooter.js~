@@ -1,0 +1,11 @@
+jam.includeModule("RectCollision");
+
+window.onload = function(){
+    initialize();
+}
+    
+function initialize(){
+    var game = jam.Game(800, 600);
+    var player = jam.Sprite(500, 400);
+    player.setImage("ship.png");
+}
